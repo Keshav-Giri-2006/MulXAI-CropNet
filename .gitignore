@@ -1,0 +1,17 @@
+datasets/
+
+outputs/checkpoints/
+
+outputs/heatmaps/
+
+outputs/logs/
+
+*.pth
+
+*.onnx
+
+*.pt
+
+__pycache__/
+
+.ipynb_checkpoints/
