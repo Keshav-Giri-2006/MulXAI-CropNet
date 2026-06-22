@@ -1,98 +1,483 @@
+# README.md
+
 # MulXAI-CropNet
 
-## Overview
+### A Lightweight Explainable Multi-task Deep Learning Framework for Tomato Disease Classification, Continuous Severity Regression, Severity-aware CPS Recommendation and Edge Deployment
 
-MulXAI-CropNet is a lightweight explainable multi-task deep learning framework for:
+---
+
+## Project Overview
+
+MulXAI-CropNet is a research-oriented lightweight Cyber Physical System (CPS) framework designed for intelligent tomato disease diagnosis and management.
+
+The proposed framework combines:
 
 * Tomato Disease Classification
-* Continuous Disease Severity Regression
-* Severity-Guided Explainable AI (SG-GradCAM++)
-* Severity-Aware CPS Treatment Recommendation
-* Raspberry Pi 5 Edge Deployment
-* Cross-Domain Generalization Evaluation
+* Continuous Severity Regression (0–100%)
+* Severity-aware Explainable AI (SG-GradCAM++)
+* Severity-aware Treatment Recommendation
+* CPS Decision Layer
+* Raspberry Pi Edge Deployment
+
+within a unified multi-task architecture.
 
 ---
 
-## Research Domain
+## Research Motivation
 
-* Agriculture 4.0
-* Cyber Physical Systems (CPS)
-* Explainable Artificial Intelligence (XAI)
-* Deep Learning
-* Edge AI
+Most existing agricultural AI systems focus on:
+
+* Disease Classification only
+* Categorical Severity Levels
+* Standalone Explainable AI
+* Independent Treatment Recommendations
+
+Very few provide:
+
+* Continuous Severity Estimation
+* Severity-aware Explainability
+* Severity-aware CPS Recommendations
+* Edge Deployment
+
+within a single lightweight framework.
+
+MulXAI-CropNet addresses these gaps.
 
 ---
 
-## Workflow
+## Research Objectives
+
+### Objective 1
+
+Develop a lightweight multi-task framework using:
+
+EfficientNetB0 + SE
+
+for:
+
+* Disease Classification
+* Continuous Severity Regression
+
+---
+
+### Objective 2
+
+Generate pseudo severity labels:
+
+0–100%
+
+using:
+
+HSV based lesion estimation.
+
+---
+
+### Objective 3
+
+Develop:
+
+Severity Guided GradCAM++
+
+(SG-GradCAM++)
+
+for severity-aware explainability.
+
+---
+
+### Objective 4
+
+Develop:
+
+Severity-aware Treatment Recommendation
+
+using:
+
+Disease + Severity
+
+↓
+
+Treatment + Urgency
+
+---
+
+### Objective 5
+
+Deploy:
+
+ONNX
+
+INT8 Quantization
+
+Raspberry Pi 5
+
+---
+
+### Objective 6
+
+Perform:
+
+Cross Domain Evaluation
+
+Train:
+
+PlantVillage
+
+Test:
+
+CCMT
+
+---
+
+# Project Structure
 
 ```text
-Data Collection
-        ↓
-Preprocessing
-        ↓
-Severity Pseudo-Label Generation
-        ↓
-Dataset Split
-        ↓
-EfficientNetB0 + SE Backbone
-       ↙             ↘
-Classification     Severity Regression
-       ↘             ↙
-      SG-GradCAM++
-            ↓
-Evaluation
-            ↓
-Treatment Recommendation
-            ↓
-CPS Decision Layer
-            ↓
-Edge Deployment
+MulXAI-CropNet/
+
+datasets/
+
+notebooks/
+
+docs/
+
+experiments/
+
+outputs/
+
+├── checkpoints/
+
+├── metrics/
+
+├── heatmaps/
+
+└── logs/
+
+src/
+
+├── models/
+
+├── preprocessing/
+
+├── training/
+
+├── evaluation/
+
+├── xai/
+
+└── cps/
+
+README.md
+
+requirements.txt
 ```
 
 ---
 
-## Datasets
+# Dataset Structure
 
-* PlantVillage (Tomato Subset)
-* TomatoVillage
-* CCMT
-* PlantDoc (Optional)
+```text
+datasets/
 
----
+PlantVillage/
 
-## Team Structure
+TomatoVillage/
 
-### Member 1
+├── Variant-B
 
-Disease Classification + Backbone Experiments
+└── Variant-c-Object_Detection
 
----
+CCMT/
 
-### Member 2
-
-Severity Regression + Pseudo-label Generation
+severity_labels/
+```
 
 ---
 
-### Member 3
+# Team Responsibilities
 
-XAI + CPS Recommendation + Deployment
+## Member 1
 
----
+Disease Classification
 
-## Expected Contributions
+Lightweight Backbone
 
-* Lightweight Multi-task CNN
-* Continuous Severity Estimation
-* SG-GradCAM++
-* Severity-aware CPS Recommendation
-* Raspberry Pi Deployment
-* Cross-Domain Validation
+EfficientNetB0 + SE
 
 ---
 
-## Status
+## Member 2
 
-Research Phase Completed
+Pseudo Label Generation
 
-Implementation Phase In Progress
+Continuous Severity Regression
+
+Kendall Uncertainty Loss
+
+Cross Domain Severity
+
+---
+
+## Member 3
+
+SG-GradCAM++
+
+Treatment Recommendation
+
+CPS Decision Layer
+
+Edge Deployment
+
+---
+
+# Official Workflow
+
+Data Collection
+
+↓
+
+Preprocessing
+
+↓
+
+Severity Label Generation
+
+↓
+
+Dataset Split
+
+↓
+
+EfficientNetB0 + SE
+
+↙             ↘
+
+Classification
+
+Severity
+
+↘             ↙
+
+SG-GradCAM++
+
+↓
+
+Evaluation
+
+↓
+
+Treatment Recommendation
+
+↓
+
+CPS
+
+↓
+
+Edge Deployment
+
+---
+
+# Official Datasets
+
+PlantVillage
+
+Purpose:
+
+Training
+
+---
+
+TomatoVillage Variant B
+
+Purpose:
+
+Pseudo Label Verification
+
+---
+
+TomatoVillage Variant C
+
+Purpose:
+
+XAI Evaluation
+
+---
+
+CCMT
+
+Purpose:
+
+Cross Domain Testing ONLY
+
+---
+
+# Frozen Evaluation Protocol
+
+PlantVillage:
+
+Train
+
+70%
+
+Validation
+
+15%
+
+Test
+
+15%
+
+---
+
+10 Fold Stratified Cross Validation
+
+Mandatory
+
+---
+
+Cross Domain:
+
+Train:
+
+PlantVillage
+
+Test:
+
+CCMT
+
+---
+
+# Expected Results
+
+Classification Accuracy:
+
+98.5–99.3%
+
+---
+
+Severity MAE:
+
+3–6%
+
+---
+
+R²:
+
+0.90–0.95
+
+---
+
+IoU:
+
+0.55–0.75
+
+---
+
+Pointing Game:
+
+70–85%
+
+---
+
+Latency:
+
+80–150 ms
+
+---
+
+# Technologies
+
+Python
+
+PyTorch
+
+EfficientNetB0
+
+Albumentations
+
+GradCAM
+
+OpenCV
+
+scikit-image
+
+ONNX
+
+NumPy
+
+Pandas
+
+---
+
+# Forbidden Technologies
+
+TensorFlow
+
+YOLO
+
+Vision Transformers
+
+MaskRCNN
+
+SAM
+
+Docker
+
+Kubernetes
+
+Cloud Deployment
+
+Large Ensembles
+
+Enterprise MLOps
+
+---
+
+# Important Documents
+
+Project_Specification_v1.1.md
+
+DATASET_USAGE.md
+
+EVALUATION_PROTOCOL.md
+
+COMPARISON_BASELINES.md
+
+INTEGRATION_PROTOCOL.md
+
+FIGURE_SPECIFICATION.md
+
+---
+
+# Project Status
+
+Research Planning
+
+COMPLETE
+
+---
+
+Literature Review
+
+COMPLETE
+
+---
+
+Dataset Collection
+
+COMPLETE
+
+---
+
+Implementation
+
+READY TO START
+
+---
+
+Version
+
+v1.1
+
+Status:
+
+Frozen Research Specification
