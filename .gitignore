@@ -1,17 +1,92 @@
+# =========================
+# DATASETS
+# =========================
+
 datasets/
+
+
+# =========================
+# ENVIRONMENT FILES
+# =========================
+
 .env
+.venv/
+venv/
+.env.*
+
+
+# =========================
+# PYTHON CACHE
+# =========================
+
+__pycache__/
+
+*.pyc
+*.pyo
+
+
+# =========================
+# JUPYTER
+# =========================
+
+.ipynb_checkpoints/
+
+
+# =========================
+# TRAINED MODELS
+# =========================
+
+*.pth
+*.pt
+*.onnx
+
+
+# =========================
+# OUTPUTS
+# =========================
+
 outputs/checkpoints/
 
 outputs/heatmaps/
 
 outputs/logs/
 
-*.pth
 
-*.onnx
+# OPTIONAL:
+# Ignore metrics if generated repeatedly
 
-*.pt
-*.pyc
-__pycache__/
+# outputs/metrics/
+
+
+# =========================
+# OPERATING SYSTEM FILES
+# =========================
+
 .DS_Store
-.ipynb_checkpoints/
+
+Thumbs.db
+
+desktop.ini
+
+
+# =========================
+# IDE FILES
+# =========================
+
+.vscode/
+
+.idea/
+
+
+# =========================
+# CONDA
+# =========================
+
+conda-meta/
+
+
+# =========================
+# LOG FILES
+# =========================
+
+*.log
