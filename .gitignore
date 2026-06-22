@@ -1,5 +1,5 @@
 datasets/
-
+.env
 outputs/checkpoints/
 
 outputs/heatmaps/
@@ -11,7 +11,7 @@ outputs/logs/
 *.onnx
 
 *.pt
-
+*.pyc
 __pycache__/
-
+.DS_Store
 .ipynb_checkpoints/
