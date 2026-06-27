@@ -4,69 +4,59 @@
 
 ## Official Dataset Usage Specification
 
-Version: 1.0
+**Version:** 1.1
 
-Status: Frozen
+**Status:** Frozen
 
-Date: June 2026
-
----
-
-# Purpose of this Document
-
-This document defines:
-
-1.
-
-Which datasets are officially used.
-
-2.
-
-The purpose of each dataset.
-
-3.
-
-Training and testing permissions.
-
-4.
-
-Cross-domain evaluation policy.
-
-5.
-
-Dataset ownership across team members.
-
-6.
-
-Which figures and metrics are generated from each dataset.
+**Last Updated:** June 2026
 
 ---
 
-# Dataset Directory
+# Purpose
 
-Official location:
+This document defines the official usage policy for every dataset included in the MulXAI-CropNet repository.
 
-```text
-F:\CPS-Research\MulXAI-CropNet\datasets\
-```
+It specifies:
 
-Structure:
+* Dataset purpose
+* Allowed usage
+* Forbidden usage
+* Training policy
+* Testing policy
+* Cross-domain evaluation policy
+* Member ownership
+* Figures and evaluation metrics supported by each dataset
+
+This document is authoritative for all future implementation.
+
+---
+
+# Official Dataset Directory
 
 ```text
 datasets/
 
 ├── PlantVillage/
-
 ├── TomatoVillage/
-
-│   ├── Variant-B-Multilabel/
-
+│   ├── Variant-a-Multiclass_Classification/
+│   ├── Variant-b-MultiLabel_Classification/
 │   └── Variant-c-Object_Detection/
-
 ├── CCMT/
-
 └── severity_labels/
 ```
+
+---
+
+# Dataset Summary
+
+| Dataset                 | Primary Purpose                     | Official Status                 |
+| ----------------------- | ----------------------------------- | ------------------------------- |
+| PlantVillage            | Main training dataset               | Primary                         |
+| TomatoVillage Variant A | Auxiliary multiclass classification | Optional                        |
+| TomatoVillage Variant B | Auxiliary multi-label validation    | Optional                        |
+| TomatoVillage Variant C | XAI quantitative evaluation         | Required                        |
+| CCMT                    | Cross-domain evaluation             | Required                        |
+| severity_labels         | Generated pseudo-labels             | Generated during implementation |
 
 ---
 
@@ -74,13 +64,13 @@ datasets/
 
 # PlantVillage Tomato Dataset
 
-Official Role:
+## Official Status
 
-PRIMARY DATASET
+Primary Dataset
 
 ---
 
-Location
+## Location
 
 ```text
 datasets/PlantVillage/
@@ -88,61 +78,60 @@ datasets/PlantVillage/
 
 ---
 
-Classes
+## Disease Classes
 
-Tomato_Bacterial_spot
-
-Tomato_Early_blight
-
-Tomato_healthy
-
-Tomato_Late_blight
-
-Tomato_Leaf_Mold
-
-Tomato_Septoria_leaf_spot
-
-Tomato_Spider_mites_Two_spotted_spider_mite
-
-Tomato__Target_Spot
-
-Tomato__Tomato_mosaic_virus
-
-Tomato__Tomato_YellowLeaf__Curl_Virus
+* Tomato_Bacterial_spot
+* Tomato_Early_blight
+* Tomato_healthy
+* Tomato_Late_blight
+* Tomato_Leaf_Mold
+* Tomato_Septoria_leaf_spot
+* Tomato_Spider_mites_Two_spotted_spider_mite
+* Tomato__Target_Spot
+* Tomato__Tomato_mosaic_virus
+* Tomato__Tomato_YellowLeaf__Curl_Virus
 
 ---
 
-Purpose
+## Official Purpose
 
-Primary Disease Classification
+Primary disease classification.
 
-Pseudo Label Generation
+Primary severity regression.
 
-Severity Regression
+Pseudo-label generation.
 
-Shared Backbone Training
+Training of the shared backbone.
 
-SG-GradCAM Visualization
+Model evaluation.
 
----
-
-Used By
-
-Member 1
-
-Disease Classification
+SG-GradCAM++ visualization.
 
 ---
 
-Member 2
+## Used By
 
-Severity Labels
+### Member 1
 
-Severity Regression
+Disease classification
+
+Baseline comparison
+
+Backbone training
 
 ---
 
-Member 3
+### Member 2
+
+Severity label generation
+
+Severity regression
+
+Cross-validation
+
+---
+
+### Member 3
 
 GradCAM
 
@@ -150,125 +139,194 @@ GradCAM++
 
 SG-GradCAM++
 
+Treatment recommendation demonstrations
+
 ---
 
-Official Split
+## Official Dataset Split
 
-Training:
+Training
 
 70%
 
-Validation:
+Validation
 
 15%
 
-Testing:
+Testing
 
 15%
 
 ---
 
-Cross Validation
+## Cross Validation
 
-10 Fold Stratified
+10-Fold Stratified Cross Validation
 
-Mandatory
-
----
-
-Training Allowed
-
-YES
+Mandatory.
 
 ---
 
-Testing Allowed
+## Allowed Usage
 
-YES
+* Training
+* Validation
+* Testing
+* Cross-validation
+* Visualization
 
 ---
 
-This is the ONLY dataset allowed for initial model training.
+## Forbidden Usage
+
+None.
+
+This is the primary benchmark dataset.
 
 ---
 
 # DATASET 2
 
-# TomatoVillage Variant B
+# TomatoVillage Variant A
 
-Official Role
+## Official Status
 
 Auxiliary Dataset
 
 ---
 
-Location
+## Location
 
 ```text
-datasets/TomatoVillage/Variant-B/
+datasets/TomatoVillage/Variant-a-Multiclass_Classification/
 ```
 
 ---
 
-Contains
+## Contents
 
-Images
+* train
+* validation
+* test
 
-CSV Metadata
+Classes include:
 
-Multi-label Information
-
----
-
-Purpose
-
-Pseudo Label Verification
-
-Auxiliary Experiments
-
-Severity Consistency Checks
-
----
-
-Used By
-
-Member 2 ONLY
+* Early Blight
+* Healthy
+* Late Blight
+* Leaf Miner
+* Magnesium Deficiency
+* Nitrogen Deficiency
+* Potassium Deficiency
+* Spotted Wilt Virus
 
 ---
 
-Training Allowed
+## Purpose
 
-NO
+This dataset is **not** part of the primary MulXAI-CropNet benchmark.
 
----
+It is retained for:
 
-Benchmarking Allowed
-
-YES
-
----
-
-Cross Validation Allowed
-
-YES
+* Supplementary multiclass classification experiments
+* External robustness analysis
+* Additional benchmarking
+* Future project extensions
 
 ---
 
-This dataset is NOT part of the primary training pipeline.
+## Used By
+
+Primarily:
+
+Member 1
+
+Only for optional supplementary experiments.
+
+---
+
+## Allowed Usage
+
+* Exploratory experiments
+* Robustness analysis
+* Future work
+
+---
+
+## Forbidden Usage
+
+Do NOT replace PlantVillage with Variant A for the official experiments.
+
+Do NOT use Variant A as the primary benchmark dataset for publication results.
 
 ---
 
 # DATASET 3
 
-# TomatoVillage Variant C
+# TomatoVillage Variant B
 
-Official Role
+## Official Status
 
-Object Detection Dataset
+Auxiliary Dataset
 
 ---
 
-Location
+## Location
+
+```text
+datasets/TomatoVillage/Variant-b-MultiLabel_Classification/
+```
+
+---
+
+## Purpose
+
+Provides multi-label annotations for supplementary experiments.
+
+Used for:
+
+* Multi-label benchmarking
+* Auxiliary validation
+* Severity-related exploratory studies
+* Future extensions
+
+---
+
+## Used By
+
+Primarily:
+
+Member 2
+
+---
+
+## Allowed Usage
+
+* Supplementary experiments
+* Validation
+* Exploratory research
+
+---
+
+## Forbidden Usage
+
+Not part of the official MulXAI-CropNet benchmark.
+
+Do not report Variant B as the primary experimental dataset.
+
+---
+
+# DATASET 4
+
+# TomatoVillage Variant C
+
+## Official Status
+
+Required
+
+---
+
+## Location
 
 ```text
 datasets/TomatoVillage/Variant-c-Object_Detection/
@@ -276,97 +334,67 @@ datasets/TomatoVillage/Variant-c-Object_Detection/
 
 ---
 
-Structure
+## Structure
 
-train/
+Contains:
 
-images/
-
-pascal_voc/
-
-yolo/
+* Images
+* Pascal VOC annotations
+* YOLO annotations
 
 ---
 
-val/
+## Purpose
 
-images/
+Quantitative evaluation of explainable AI.
 
-pascal_voc/
-
-yolo/
+Used to compare model attention against lesion annotations.
 
 ---
 
-Contains
+## Used By
 
-Images
-
-Bounding Boxes
-
-YOLO Labels
-
-Pascal VOC Labels
+Member 3
 
 ---
 
-Purpose
+## Metrics Supported
 
-Quantitative XAI Evaluation
-
----
-
-Used By
-
-Member 3 ONLY
+* IoU
+* Pointing Game
+* Localization Accuracy
 
 ---
 
-Metrics
+## Allowed Usage
 
-IoU
-
-Pointing Game
-
-Localization Accuracy
+* XAI evaluation
+* Heatmap validation
+* Lesion localization
 
 ---
 
-Training Allowed
+## Forbidden Usage
 
-NO
+Not permitted for:
 
----
-
-Classification Training
-
-FORBIDDEN
+* Disease classifier training
+* Severity regression training
+* Official benchmark training
 
 ---
 
-Severity Training
-
-FORBIDDEN
-
----
-
-Used ONLY for:
-
-XAI Evaluation.
-
----
-
-# DATASET 4
+# DATASET 5
 
 # CCMT Tomato Dataset
 
-Official Role
+## Official Status
 
-Cross Domain Dataset
+Required
 
 ---
 
-Location
+## Location
 
 ```text
 datasets/CCMT/Tomato/
@@ -374,97 +402,77 @@ datasets/CCMT/Tomato/
 
 ---
 
-Classes
+## Classes
 
-Healthy
-
-Leaf Blight
-
-Leaf Curl
-
-Septoria Leaf Spot
-
-Verticillium Wilt
+* Healthy
+* Leaf Blight
+* Leaf Curl
+* Septoria Leaf Spot
+* Verticillium Wilt
 
 ---
 
-Purpose
+## Purpose
 
-Cross Domain Testing
+Cross-domain evaluation.
 
-Generalization Evaluation
+Real-world robustness assessment.
 
-Real World Robustness
+Generalization testing.
 
 ---
 
-Used By
+## Used By
 
 Member 1
 
-Cross Domain Classification
+Cross-domain classification.
 
 ---
 
 Member 2
 
-Cross Domain Severity
+Cross-domain severity estimation.
 
 ---
 
 Member 3
 
-Cross Domain Heatmaps
+Cross-domain SG-GradCAM++ visualization.
 
 ---
 
-Training Allowed
+## Allowed Usage
 
-ABSOLUTELY NOT
-
----
-
-Validation Allowed
-
-NO
+Testing ONLY.
 
 ---
 
-Testing Allowed
+## Forbidden Usage
 
-YES
+Training
 
----
+Validation
 
-Official Protocol
+Hyperparameter tuning
 
-Train:
+Model selection
 
-PlantVillage
-
-↓
-
-Test:
-
-CCMT
+CCMT must never influence training.
 
 ---
 
-This rule MUST NEVER be violated.
-
----
-
-# DATASET 5
+# DATASET 6
 
 # Severity Labels
 
-Official Role
+## Official Status
 
 Generated Dataset
 
 ---
 
-Location
+## Location
 
 ```text
 datasets/severity_labels/
@@ -472,13 +480,17 @@ datasets/severity_labels/
 
 ---
 
-Created By
+## Generated By
 
 Member 2
 
 ---
 
-Generated Using
+## Pipeline
+
+RGB Image
+
+↓
 
 HSV Conversion
 
@@ -496,231 +508,120 @@ Infected Area Calculation
 
 ↓
 
-Severity Percentage
+Continuous Severity Percentage
 
 ---
 
-Format
+## Output File
 
+```text
 severity_labels.csv
+```
 
 ---
 
-Columns
+## Required Columns
 
-filename
-
-disease
-
-severity
+* filename
+* disease_class
+* severity_percentage
 
 ---
 
-Example
+## Severity Range
 
-img001.jpg
+Continuous values
 
-Early Blight
-
-34.5
+0–100%
 
 ---
 
-Range
+Categorical labels such as:
 
-0
+* Mild
+* Moderate
+* Severe
 
-to
-
-100
-
-Continuous
+are NOT permitted.
 
 ---
 
-Categorical Labels:
+# Official Member Dataset Ownership
 
-FORBIDDEN
+## Member 1
 
----
+Reads:
 
-# Dataset Ownership
+* PlantVillage
+* CCMT
+* Variant A (optional)
 
-Member 1
+Writes:
 
-Read:
-
-PlantVillage
-
-CCMT
+None
 
 ---
 
-Write:
+## Member 2
 
-NONE
+Reads:
 
----
+* PlantVillage
+* Variant B
+* CCMT
 
-Member 2
-
-Read:
-
-PlantVillage
-
-TomatoVillage
-
-CCMT
-
----
-
-Write:
+Writes:
 
 severity_labels/
 
-ONLY
-
 ---
 
-Member 3
+## Member 3
 
-Read:
+Reads:
 
-PlantVillage
+* PlantVillage
+* Variant C
+* CCMT
+* severity_labels/
 
-TomatoVillage Variant C
+Writes:
 
-CCMT
-
-severity_labels
-
----
-
-Write:
-
-NONE
+None
 
 ---
 
 # Official Dataset Usage Matrix
 
-PlantVillage
-
-Classification
-
-YES
-
----
-
-Severity
-
-YES
-
----
-
-XAI
-
-YES
-
----
-
-Cross Domain
-
-NO
-
----
-
-TomatoVillage B
-
-Classification
-
-NO
-
----
-
-Severity Validation
-
-YES
-
----
-
-XAI
-
-NO
-
----
-
-TomatoVillage C
-
-Classification
-
-NO
-
----
-
-Severity
-
-NO
-
----
-
-XAI
-
-YES
-
----
-
-Bounding Boxes
-
-YES
-
----
-
-CCMT
-
-Classification Testing
-
-YES
-
----
-
-Severity Testing
-
-YES
-
----
-
-XAI Testing
-
-YES
-
----
-
-Training
-
-NO
+| Dataset      | Classification | Severity | XAI     | Cross-Domain | Official Paper     |
+| ------------ | -------------- | -------- | ------- | ------------ | ------------------ |
+| PlantVillage | ✓              | ✓        | ✓       | ✗            | ✓                  |
+| Variant A    | Optional       | ✗        | ✗       | ✗            | Supplementary Only |
+| Variant B    | Optional       | Optional | ✗       | ✗            | Supplementary Only |
+| Variant C    | ✗              | ✗        | ✓       | ✗            | ✓                  |
+| CCMT         | Testing        | Testing  | Testing | ✓            | ✓                  |
 
 ---
 
 # Figures Supported
 
-Figure 1
+## Figure 1
 
 Workflow
 
-No Dataset
+No dataset required.
 
 ---
 
-Figure 2
+## Figure 2
 
 Architecture
 
-No Dataset
+No dataset required.
 
 ---
 
-Figure 3
+## Figure 3
 
 HSV Severity Generation
 
@@ -728,17 +629,21 @@ PlantVillage
 
 ---
 
-Figure 4
+## Figure 4
+
+GradCAM
+
+GradCAM++
 
 SG-GradCAM++
 
 PlantVillage
 
-TomatoVillage C
+Variant C
 
 ---
 
-Figure 5
+## Figure 5
 
 Treatment Recommendation
 
@@ -748,102 +653,50 @@ Severity Labels
 
 ---
 
-Figure 6
+## Figure 6
 
-Cross Domain Evaluation
-
-PlantVillage
-
-CCMT
-
----
-
-Figure 7
-
-Raspberry Pi Deployment
-
-PlantVillage
-
----
-
-# Important Restrictions
-
-CCMT
-
-MUST NEVER be used for training.
-
----
-
-TomatoVillage Variant C
-
-MUST NEVER be used for classification training.
-
----
-
-TomatoVillage Variant B
-
-MUST NEVER replace PlantVillage.
-
----
-
-Severity Labels
-
-MUST remain continuous:
-
-0–100%
-
----
-
-Categorical Severity:
-
-Mild
-
-Moderate
-
-Severe
-
-is NOT allowed.
-
----
-
-# Final Dataset Policy
+Cross-Domain Evaluation
 
 PlantVillage
 
 ↓
 
-Train
-
-Validate
-
-Test
-
-Pseudo Labels
-
----
-
 CCMT
 
-↓
+---
 
-Cross Domain Testing ONLY
+## Figure 7
+
+Edge Deployment
+
+PlantVillage
 
 ---
 
-TomatoVillage B
+# Critical Rules
 
-↓
+1. PlantVillage is the official training dataset.
 
-Auxiliary Severity Validation
+2. CCMT is reserved exclusively for cross-domain testing.
+
+3. Variant C is reserved for XAI evaluation.
+
+4. Variant A and Variant B are auxiliary datasets only.
+
+5. Continuous severity regression (0–100%) is mandatory.
+
+6. Categorical severity labels are prohibited.
+
+7. Training on CCMT is strictly forbidden.
+
+8. No dataset substitutions are permitted without a formal revision of the project specification.
 
 ---
 
-TomatoVillage C
+# Final Statement
 
-↓
+This document defines the official dataset governance policy for MulXAI-CropNet.
 
-XAI Evaluation ONLY
+All experiments, benchmarks, comparisons, figures, and publication results shall comply with the dataset usage rules defined herein unless superseded by a future version of the Project Specification.
 
----
-
-This dataset policy is frozen and remains valid for all future MulXAI-CropNet implementations unless explicitly revised in a future specification version.
+Version 1.1 is considered frozen for the implementation phase.
