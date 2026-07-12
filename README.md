@@ -1,483 +1,87 @@
-# README.md
+# MulXAI-CropNet: Tomato Disease Classification
 
-# MulXAI-CropNet
+An undergraduate research project for tomato disease classification using deep learning.
 
-### A Lightweight Explainable Multi-task Deep Learning Framework for Tomato Disease Classification, Continuous Severity Regression, Severity-aware CPS Recommendation and Edge Deployment
+## Project Structure
 
----
-
-## Project Overview
-
-MulXAI-CropNet is a research-oriented lightweight Cyber Physical System (CPS) framework designed for intelligent tomato disease diagnosis and management.
-
-The proposed framework combines:
-
-* Tomato Disease Classification
-* Continuous Severity Regression (0–100%)
-* Severity-aware Explainable AI (SG-GradCAM++)
-* Severity-aware Treatment Recommendation
-* CPS Decision Layer
-* Raspberry Pi Edge Deployment
-
-within a unified multi-task architecture.
-
----
-
-## Research Motivation
-
-Most existing agricultural AI systems focus on:
-
-* Disease Classification only
-* Categorical Severity Levels
-* Standalone Explainable AI
-* Independent Treatment Recommendations
-
-Very few provide:
-
-* Continuous Severity Estimation
-* Severity-aware Explainability
-* Severity-aware CPS Recommendations
-* Edge Deployment
-
-within a single lightweight framework.
-
-MulXAI-CropNet addresses these gaps.
-
----
-
-## Research Objectives
-
-### Objective 1
-
-Develop a lightweight multi-task framework using:
-
-EfficientNetB0 + SE
-
-for:
-
-* Disease Classification
-* Continuous Severity Regression
-
----
-
-### Objective 2
-
-Generate pseudo severity labels:
-
-0–100%
-
-using:
-
-HSV based lesion estimation.
-
----
-
-### Objective 3
-
-Develop:
-
-Severity Guided GradCAM++
-
-(SG-GradCAM++)
-
-for severity-aware explainability.
-
----
-
-### Objective 4
-
-Develop:
-
-Severity-aware Treatment Recommendation
-
-using:
-
-Disease + Severity
-
-↓
-
-Treatment + Urgency
-
----
-
-### Objective 5
-
-Deploy:
-
-ONNX
-
-INT8 Quantization
-
-Raspberry Pi 5
-
----
-
-### Objective 6
-
-Perform:
-
-Cross Domain Evaluation
-
-Train:
-
-PlantVillage
-
-Test:
-
-CCMT
-
----
-
-# Project Structure
-
-```text
+```
 MulXAI-CropNet/
-
-datasets/
-
-notebooks/
-
-docs/
-
-experiments/
-
-outputs/
-
-├── checkpoints/
-
-├── metrics/
-
-├── heatmaps/
-
-└── logs/
-
-src/
-
-├── models/
-
-├── preprocessing/
-
-├── training/
-
-├── evaluation/
-
-├── xai/
-
-└── cps/
-
-README.md
-
-requirements.txt
+├── src/
+│   ├── training/           # Training utilities
+│   │   ├── dataset_loader.py
+│   │   ├── trainer.py
+│   │   ├── training_loop.py
+│   │   └── callbacks.py
+│   ├── models/             # Model architectures
+│   │   ├── base_model.py
+│   │   ├── resnet_model.py
+│   │   ├── efficientnet_model.py
+│   │   └── model_utils.py
+│   ├── evaluation/         # Evaluation utilities
+│   │   ├── evaluator.py
+│   │   ├── metrics.py
+│   │   └── visualizer.py
+│   ├── data/               # Data utilities
+│   │   ├── preprocessing.py
+│   │   └── augmentation.py
+│   └── utils/              # Utilities
+│       ├── config.py
+│       ├── logger.py
+│       └── constants.py
+├── scripts/
+│   ├── train.py
+│   ├── evaluate.py
+│   └── inference.py
+├── tests/
+│   ├── test_dataset.py
+│   └── test_model.py
+├── requirements.txt
+└── README.md
 ```
 
----
+## Installation
 
-# Dataset Structure
-
-```text
-datasets/
-
-PlantVillage/
-
-TomatoVillage/
-
-├── Variant-B
-
-└── Variant-c-Object_Detection
-
-CCMT/
-
-severity_labels/
+```bash
+pip install -r requirements.txt
 ```
 
----
+## Dataset
 
-# Team Responsibilities
+Assumes PlantVillage Tomato dataset is located at: `datasets/PlantVillage/`
 
-## Member 1
+## Training
 
-Disease Classification
+```bash
+python scripts/train.py --model efficientnetb0 --epochs 30 --lr 0.001
+```
 
-Lightweight Backbone
+## Evaluation
 
-EfficientNetB0 + SE
+```bash
+python scripts/evaluate.py --model efficientnetb0 --checkpoint checkpoints/best_model.pth
+```
 
----
+## Inference
 
-## Member 2
+```bash
+python scripts/inference.py --model efficientnetb0 --checkpoint checkpoints/best_model.pth --image path/to/image.jpg
+```
 
-Pseudo Label Generation
+## Features
 
-Continuous Severity Regression
+- ✅ Automatic dataset discovery (no hardcoded class names)
+- ✅ Multiple model architectures (ResNet, EfficientNet)
+- ✅ Comprehensive evaluation metrics
+- ✅ Data augmentation strategies
+- ✅ Modular and extensible design
+- ✅ Detailed logging and checkpointing
 
-Kendall Uncertainty Loss
+## Approved Models (Research Specification)
 
-Cross Domain Severity
+- EfficientNet-B0 (default, lightweight)
+- MobileNetV3 (efficient)
+- EfficientNet-B0 + SE (with squeeze-excitation)
 
----
+## Authors
 
-## Member 3
-
-SG-GradCAM++
-
-Treatment Recommendation
-
-CPS Decision Layer
-
-Edge Deployment
-
----
-
-# Official Workflow
-
-Data Collection
-
-↓
-
-Preprocessing
-
-↓
-
-Severity Label Generation
-
-↓
-
-Dataset Split
-
-↓
-
-EfficientNetB0 + SE
-
-↙             ↘
-
-Classification
-
-Severity
-
-↘             ↙
-
-SG-GradCAM++
-
-↓
-
-Evaluation
-
-↓
-
-Treatment Recommendation
-
-↓
-
-CPS
-
-↓
-
-Edge Deployment
-
----
-
-# Official Datasets
-
-PlantVillage
-
-Purpose:
-
-Training
-
----
-
-TomatoVillage Variant B
-
-Purpose:
-
-Pseudo Label Verification
-
----
-
-TomatoVillage Variant C
-
-Purpose:
-
-XAI Evaluation
-
----
-
-CCMT
-
-Purpose:
-
-Cross Domain Testing ONLY
-
----
-
-# Frozen Evaluation Protocol
-
-PlantVillage:
-
-Train
-
-70%
-
-Validation
-
-15%
-
-Test
-
-15%
-
----
-
-10 Fold Stratified Cross Validation
-
-Mandatory
-
----
-
-Cross Domain:
-
-Train:
-
-PlantVillage
-
-Test:
-
-CCMT
-
----
-
-# Expected Results
-
-Classification Accuracy:
-
-98.5–99.3%
-
----
-
-Severity MAE:
-
-3–6%
-
----
-
-R²:
-
-0.90–0.95
-
----
-
-IoU:
-
-0.55–0.75
-
----
-
-Pointing Game:
-
-70–85%
-
----
-
-Latency:
-
-80–150 ms
-
----
-
-# Technologies
-
-Python
-
-PyTorch
-
-EfficientNetB0
-
-Albumentations
-
-GradCAM
-
-OpenCV
-
-scikit-image
-
-ONNX
-
-NumPy
-
-Pandas
-
----
-
-# Forbidden Technologies
-
-TensorFlow
-
-YOLO
-
-Vision Transformers
-
-MaskRCNN
-
-SAM
-
-Docker
-
-Kubernetes
-
-Cloud Deployment
-
-Large Ensembles
-
-Enterprise MLOps
-
----
-
-# Important Documents
-
-Project_Specification_v1.1.md
-
-DATASET_USAGE.md
-
-EVALUATION_PROTOCOL.md
-
-COMPARISON_BASELINES.md
-
-INTEGRATION_PROTOCOL.md
-
-FIGURE_SPECIFICATION.md
-
----
-
-# Project Status
-
-Research Planning
-
-COMPLETE
-
----
-
-Literature Review
-
-COMPLETE
-
----
-
-Dataset Collection
-
-COMPLETE
-
----
-
-Implementation
-
-READY TO START
-
----
-
-Version
-
-v1.1
-
-Status:
-
-Frozen Research Specification
+Member 1 - MulXAI-CropNet Research Team
