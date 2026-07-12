@@ -78,7 +78,8 @@ Edge Deployment
 
 MulXAI-CropNet Architecture
 
-Shared EfficientNetB0 + SE
+Shared EfficientNetB0
++ (standard architecture, native SE — repository identifier `efficientnetb0_se`)
 
 ↓
 

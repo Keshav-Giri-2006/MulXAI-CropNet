@@ -80,7 +80,10 @@ python scripts/inference.py --model efficientnetb0 --checkpoint checkpoints/best
 
 - EfficientNet-B0 (default, lightweight)
 - MobileNetV3 (efficient)
-- EfficientNet-B0 + SE (with squeeze-excitation)
+- EfficientNet-B0 — selected/shared backbone, model identifier `efficientnetb0_se`.
++   Uses the standard EfficientNet-B0 architecture; Squeeze-and-Excitation is
++   native to its MBConv blocks. The `_se` suffix is retained from earlier
++   project planning for backward compatibility and is not a separate architecture.
 
 ## Authors
 

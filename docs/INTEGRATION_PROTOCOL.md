@@ -34,7 +34,7 @@ MobileNetV3
 
 ↓
 
-EfficientNetB0 + SE
+EfficientNetB0 (Final Selected Backbone — `efficientnetb0_se`)
 
 ↓
 

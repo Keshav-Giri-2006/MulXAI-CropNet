@@ -161,9 +161,15 @@ Lightweight comparison.
 
 ## Proposed Backbone
 
-EfficientNetB0 + SE
+EfficientNetB0
 
-(SE = Squeeze Excitation)
+(Standard architecture — Squeeze-and-Excitation is native to its MBConv
+
+blocks; no additional external SE module is implemented.)
+
+Code identifier: `efficientnetb0_se` (retained for backward compatibility
+
+with existing configuration and checkpoints).
 
 This becomes:
 
@@ -593,7 +599,7 @@ A trained MobileNetV3 baseline
 
 3.
 
-The final EfficientNetB0 + SE backbone
+The final EfficientNetB0 backbone (`efficientnetb0_se`)
 
 4.
 

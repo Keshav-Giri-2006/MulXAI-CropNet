@@ -38,7 +38,7 @@ Disease Classification
 
 Lightweight Backbone
 
-EfficientNetB0 + SE
+EfficientNetB0 (selected backbone, identifier: `efficientnetb0_se`)
 
 ---
 
@@ -209,7 +209,11 @@ and
 
 Continuous Severity Regression
 
-using a shared EfficientNetB0 + SE backbone.
+using a shared EfficientNetB0 backbone (project identifier `efficientnetb0_se`).
+
+This is the standard EfficientNet-B0 architecture; Squeeze-and-Excitation is
+
+native to its MBConv blocks — no additional external SE module is implemented.
 
 ---
 
@@ -407,7 +411,7 @@ Dataset Split
 
 ↓
 
-EfficientNetB0 + SE Shared Backbone
+EfficientNetB0 Shared Backbone (`efficientnetb0_se`)
 
 ↙                    ↘
 
@@ -441,7 +445,9 @@ Edge Deployment
 
 Shared Backbone:
 
-EfficientNetB0 + SE
+EfficientNetB0 — standard architecture, native SE
+
+(project identifier: `efficientnetb0_se`, retained for compatibility)
 
 ---
 
@@ -785,7 +791,7 @@ PyTorch
 
 EfficientNetB0
 
-SE Blocks
+(native SE — no separate technology entry required)
 
 Albumentations
 

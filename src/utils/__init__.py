@@ -1,15 +1,17 @@
 """Utils package for MulXAI-CropNet."""
 
-from .config import DEFAULT_CONFIG, ProjectConfig
-from .logger import setup_logger, logger
-from .constants import TOMATO_DISEASE_CLASSES, IMAGENET_MEAN, IMAGENET_STD
+from .config import Config, DataConfig, ModelConfig, TrainingConfig
+from .logger import setup_logger, get_logger
+from .constants import TOMATO_DISEASES, IMAGENET_MEAN, IMAGENET_STD
 
 __all__ = [
-    "DEFAULT_CONFIG",
-    "ProjectConfig",
+    "Config",
+    "DataConfig",
+    "ModelConfig",
+    "TrainingConfig",
     "setup_logger",
-    "logger",
-    "TOMATO_DISEASE_CLASSES",
+    "get_logger",
+    "TOMATO_DISEASES",
     "IMAGENET_MEAN",
     "IMAGENET_STD",
 ]

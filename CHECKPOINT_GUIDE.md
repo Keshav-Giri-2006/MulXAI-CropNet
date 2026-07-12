@@ -112,7 +112,7 @@ Typical sizes for approved models:
 | Model | Parameters | .pth Size |
 |-------|-----------|-----------|
 | EfficientNet-B0 | 5.3M | ~22 MB |
-| EfficientNet-B0 + SE | 5.3M | ~22 MB |
+| EfficientNet-B0 (`efficientnetb0_se`) | 5.3M | ~22 MB |
 | MobileNetV3 | 5.4M | ~22 MB |
 
 ## Checkpoint Management

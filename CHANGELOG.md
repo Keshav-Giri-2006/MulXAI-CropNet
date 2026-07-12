@@ -275,3 +275,49 @@ Current Status:
 Research Planning Complete
 
 Implementation Ready
+
+---
+
+## Implementation Phase Clarification
+
+Date:
+
+July 2026
+
+Status:
+
+Documentation Terminology Clarification (non-breaking)
+
+---
+
+Clarified:
+
+The term "EfficientNetB0 + SE" used throughout earlier planning documents
+refers to the standard EfficientNet-B0 architecture, whose native MBConv
+blocks already include Squeeze-and-Excitation.
+
+No additional external SE module was ever implemented or is planned.
+
+---
+
+Code identifier:
+
+`efficientnetb0_se`
+
+is retained unchanged for backward compatibility with existing configuration,
+checkpoints, and scripts.
+
+It denotes the project's selected/shared backbone, not a distinct architecture
+from `efficientnetb0`.
+
+---
+
+Scope:
+
+Documentation wording only.
+
+No implementation, model classes, CLI arguments, or public APIs were modified.
+
+---
+
+Historical Version 1.1 entries above remain unchanged as the original record.
