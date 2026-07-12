@@ -47,11 +47,14 @@ def create_model(
     """
     model_name_lower = model_name.lower().replace('_', '')
 
-    if model_name_lower not in MODEL_REGISTRY:
+    normalized_registry = {key.replace('_', ''): key for key in MODEL_REGISTRY}
+
+    if model_name_lower not in normalized_registry:
         available = ', '.join(MODEL_REGISTRY.keys())
         raise ValueError(f"Model not approved: {model_name}. Approved models: {available}")
 
-    model_class = MODEL_REGISTRY[model_name_lower]
+    registry_key = normalized_registry[model_name_lower]
+    model_class = MODEL_REGISTRY[registry_key]
     model = model_class(num_classes=num_classes, pretrained=pretrained)
     model = model.to(device)
 
