@@ -2,11 +2,11 @@ Member 1
 
 [ ] Dataset Loader
 
-[ ] EfficientNet
+[x] EfficientNet
 
-[ ] MobileNet
+[x] MobileNet
 
-[ ] EfficientNet+SE
+[x] EfficientNet+SE
 
 [ ] CV
 

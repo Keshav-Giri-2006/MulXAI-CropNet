@@ -21,7 +21,7 @@ from albumentations.pytorch import ToTensorV2
 import torch
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
-
+from src.data.augmentation import AugmentationFactory
 
 class PlantVillageDataset(Dataset):
     """
@@ -145,34 +145,23 @@ def load_dataset_paths(
 
 
 def create_train_transform() -> A.Compose:
-    """Create training augmentation pipeline."""
-    return A.Compose([
-        A.HorizontalFlip(p=0.5),
-        A.VerticalFlip(p=0.3),
-        A.Rotate(limit=20, p=0.5),
-        A.RandomBrightnessContrast(p=0.3),
-        A.GaussBlur(blur_limit=3, p=0.1),
-        A.Resize(224, 224),
-        A.Normalize(
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225],
-            max_pixel_value=255.0,
-        ),
-        ToTensorV2(),
-    ])
+    """Create training augmentation pipeline.
+
+    Delegates to AugmentationFactory.get_moderate_augmentation(), the single
+    source of truth for the approved training augmentation policy
+    (src/data/augmentation.py).
+    """
+    return AugmentationFactory.get_moderate_augmentation()
 
 
 def create_val_transform() -> A.Compose:
-    """Create validation/test preprocessing pipeline without augmentation."""
-    return A.Compose([
-        A.Resize(224, 224),
-        A.Normalize(
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225],
-            max_pixel_value=255.0,
-        ),
-        ToTensorV2(),
-    ])
+    """Create validation/test preprocessing pipeline without augmentation.
+
+    Delegates to AugmentationFactory.get_light_augmentation(), the single
+    source of truth for the approved validation/test preprocessing pipeline
+    (src/data/augmentation.py).
+    """
+    return AugmentationFactory.get_light_augmentation()
 
 
 def train_val_test_split(

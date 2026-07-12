@@ -33,7 +33,7 @@ class AugmentationFactory:
             A.VerticalFlip(p=0.3),
             A.Rotate(limit=20, p=0.5),
             A.RandomBrightnessContrast(p=0.3),
-            A.RandomResizedCrop(224, 224, scale=(0.9, 1.0), p=0.2),
+            A.RandomResizedCrop(size=(224, 224), scale=(0.9, 1.0), p=0.2),
             A.Resize(224, 224),
             A.Normalize(
                 mean=[0.485, 0.456, 0.406],
@@ -51,7 +51,7 @@ class AugmentationFactory:
             A.VerticalFlip(p=0.3),
             A.Rotate(limit=30, p=0.7),
             A.RandomBrightnessContrast(p=0.5, brightness_limit=0.3, contrast_limit=0.3),
-            A.RandomResizedCrop(224, 224, scale=(0.8, 1.0), p=0.3),
+            A.RandomResizedCrop(size=(224, 224), scale=(0.8, 1.0), p=0.3),
             A.Resize(224, 224),
             A.Normalize(
                 mean=[0.485, 0.456, 0.406],
