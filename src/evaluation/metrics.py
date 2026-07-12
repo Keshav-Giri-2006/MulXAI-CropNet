@@ -93,13 +93,9 @@ class Metrics:
 
             per_class_metrics[class_name] = {
                 'accuracy': accuracy_score(class_targets, class_preds),
-                'precision': precision_score(
-                    class_targets, class_preds, average='weighted', zero_division=0
-                ),
-                'recall': recall_score(
-                    class_targets, class_preds, average='weighted', zero_division=0
-                ),
-                'f1': f1_score(class_targets, class_preds, average='weighted', zero_division=0),
+                'precision': precision_score(y_true, y_pred, labels=[class_idx], average=None, zero_division=0)[0],
+                'recall': recall_score(y_true, y_pred, labels=[class_idx], average=None, zero_division=0)[0],
+                'f1': f1_score(y_true, y_pred, labels=[class_idx], average=None, zero_division=0)[0],
                 'samples': class_mask.sum(),
             }
 

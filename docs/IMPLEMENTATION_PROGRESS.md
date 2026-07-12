@@ -1,6 +1,6 @@
 Member 1
 
-[ ] Dataset Loader
+[x] Dataset Loader
 
 [x] EfficientNet
 
@@ -12,6 +12,7 @@ Member 1
 
 [ ] Metrics
 
+[x] Per-class Precision / Recall / F1 computation repaired
 --------------------------------
 
 Member 2
