@@ -269,6 +269,8 @@ Validation
 
 Testing
 
+This split is created once and is not reshuffled. The 15% Testing partition remains permanently held out from Cross Validation (see ADR-007) and is reserved for the single final evaluation of the selected backbone.
+
 ---
 
 Later:
@@ -437,6 +439,8 @@ You MUST perform:
 
 10 Fold Stratified Cross Validation
 
+Scope (see ADR-007): Cross Validation is performed only within the combined 85% Training + Validation pool defined under DATA SPLIT above. The 15% Testing partition is never included in any fold.
+
 Report:
 
 Mean Accuracy
@@ -446,6 +450,12 @@ Mean F1
 Standard Deviation
 
 95% Confidence Interval
+
+computed across the 10 folds.
+
+---
+
+After model selection via Cross Validation, evaluate the selected backbone exactly once on the untouched 15% Testing partition. This single evaluation is the final reported test result and is not repeated or reshuffled.
 
 ---
 

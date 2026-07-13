@@ -431,6 +431,67 @@ Prevents downstream work from depending on unstable upstream components.
 
 ---
 
+# ADR-007
+
+## Title
+
+Interaction Between the Fixed 70/15/15 Split and 10-Fold Stratified Cross Validation
+
+### Date
+
+July 2026
+
+### Status
+
+Accepted
+
+---
+
+## Context
+
+`EVALUATION_PROTOCOL.md`, `Project_Specification_v1.1.md`, `MEMBER1_CLASSIFICATION_GUIDE.md`, and `DATASET_USAGE.md` each independently mandate two requirements for the PlantVillage dataset:
+
+1. A fixed 70% / 15% / 15% train / validation / test split, with random reshuffling after experiments explicitly forbidden.
+2. 10-Fold Stratified Cross Validation, reported as Mean, Standard Deviation, and 95% Confidence Interval across folds.
+
+None of these documents specified how the two requirements combine procedurally. Read literally, "split data into 10 folds" could be interpreted as operating over the entire dataset, which would conflict with maintaining a single, permanently untouched test partition — since a dataset-wide 10-fold procedure would, across its 10 repetitions, use every sample as test data at some point, including the samples otherwise designated as the fixed 15% test set.
+
+This ambiguity was identified during the Member 1 implementation audit and confirmed, by exhaustive search of all governance documents, to be a genuine specification gap rather than an oversight resolvable by inspection.
+
+---
+
+## Decision
+
+The following procedure is the authoritative interpretation and shall govern all Member 1 evaluation going forward:
+
+1. PlantVillage is split exactly once into a fixed 70% / 15% / 15% train / validation / test partition, using stratified sampling with a fixed random seed, as already implemented in `train_val_test_split()`.
+2. The 15% test partition is set aside and remains permanently held out. It is not used in any capacity during Cross Validation.
+3. 10-Fold Stratified Cross Validation is performed only within the remaining 85% (the combined train + validation pool), not across the full dataset.
+4. Cross-validation statistics — Mean, Standard Deviation, and 95% Confidence Interval — are computed across the 10 folds drawn from this 85% pool, for all mandated metrics (Accuracy, Precision, Recall, Macro F1).
+5. After model selection via Cross Validation, the finally selected backbone is evaluated exactly once on the untouched 15% test partition. This single evaluation produces the final reported test metrics; it is not repeated, reshuffled, or averaged with the CV folds.
+
+---
+
+## Rationale
+
+This interpretation:
+
+- satisfies "Random reshuffling after experiments: NOT ALLOWED" literally, since the test partition is fixed once and never re-entered into any subsequent split or fold;
+- satisfies the Cross Validation requirement's statistical intent (Mean/Std/95% CI across folds) without contaminating the final test evaluation with data the model selection process has already seen;
+- follows standard nested-validation methodology (CV for model selection and robustness estimation, a single untouched holdout for the final reported number), which is the conventional resolution to this exact ambiguity in machine learning research practice;
+- avoids retroactively reinterpreting the already-implemented `train_val_test_split()` function, minimizing implementation churn per ADR-005.
+
+---
+
+## Impact
+
+- `train_val_test_split()` in `src/training/dataset_loader.py` is unchanged and continues to produce the fixed 70/15/15 partition.
+- A new stratified 10-fold split utility, operating only on the 85% train+validation pool (not the full dataset and not including the 15% test partition), is required for Cross Validation implementation.
+- The 15% test partition must never be passed into the Cross Validation fold-generation logic.
+- `EVALUATION_PROTOCOL.md`, `Project_Specification_v1.1.md`, `MEMBER1_CLASSIFICATION_GUIDE.md`, and `DATASET_USAGE.md` are updated to reflect this resolved protocol (see corresponding Changelog/document updates).
+
+---
+
 # Future ADRs
 
 Future architectural decisions should follow this template.

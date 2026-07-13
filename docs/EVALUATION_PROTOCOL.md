@@ -69,9 +69,17 @@ Mandatory.
 
 ---
 
+Scope (see ADR-007):
+
+Cross Validation is performed only within the combined 85% Training + Validation pool defined above.
+
+The 15% Testing partition is set aside once and remains permanently held out; it is never included in any Cross Validation fold.
+
+---
+
 Procedure:
 
-Split data into:
+Split the 85% Training + Validation pool into:
 
 10 folds
 
@@ -99,7 +107,15 @@ Standard Deviation
 
 95% Confidence Interval
 
-for all metrics.
+for all metrics, computed across the 10 folds.
+
+---
+
+Final Reported Test Metrics:
+
+After model selection via Cross Validation, evaluate the selected backbone exactly once on the untouched 15% Testing partition.
+
+This single evaluation is the final reported test result and is not repeated or reshuffled.
 
 ---
 
@@ -294,3 +310,5 @@ All reported improvements should be statistically justified whenever applicable.
 # Final Rule
 
 These evaluation protocols are frozen and must remain unchanged throughout the MulXAI-CropNet project.
+
+The Cross Validation scope clarification in this document reflects ADR-007 and does not alter any other frozen requirement.

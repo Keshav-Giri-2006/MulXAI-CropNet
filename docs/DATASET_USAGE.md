@@ -166,6 +166,8 @@ Testing:
 
 15%
 
+This split is created once, using stratified sampling with a fixed random seed, and is not reshuffled.
+
 ---
 
 Cross Validation
@@ -173,6 +175,8 @@ Cross Validation
 10 Fold Stratified
 
 Mandatory
+
+Scope (see ADR-007): performed only within the combined 85% Training + Validation pool. The 15% Testing partition is set aside once, remains permanently held out from every Cross Validation fold, and is used only for the single final evaluation of the selected backbone after model selection.
 
 ---
 
@@ -847,3 +851,5 @@ XAI Evaluation ONLY
 ---
 
 This dataset policy is frozen and remains valid for all future MulXAI-CropNet implementations unless explicitly revised in a future specification version.
+
+The Cross Validation scope clarification above reflects ADR-007 and does not alter any other frozen requirement in this document.

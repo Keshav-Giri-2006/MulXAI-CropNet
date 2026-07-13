@@ -617,6 +617,8 @@ CCMT
 
 Mandatory.
 
+Scope (see ADR-007): performed only within the combined 85% Training + Validation pool. The 15% Testing partition remains permanently held out and is never included in any fold. After model selection via Cross Validation, the selected backbone is evaluated exactly once on the untouched 15% Testing partition; this single evaluation is the final reported test result.
+
 ---
 
 # Expected Results (Frozen)
