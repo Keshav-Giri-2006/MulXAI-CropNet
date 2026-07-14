@@ -262,3 +262,87 @@ def get_dataloaders(
     )
 
     return {"train": train_loader, "val": val_loader, "test": test_loader, "class_names": class_names}
+
+# src/training/dataset_loader.py (ADDITIVE — appended, nothing existing changed)
+def get_cv_pool_and_holdout(
+    dataset_root: str,
+    test_ratio: float = 0.15,
+    random_seed: int = 42,
+) -> Tuple[Tuple[List[str], List[int]], Tuple[List[str], List[int]], List[str]]:
+    """Returns (cv_pool_paths, cv_pool_labels), (test_paths, test_labels), class_names.
+    The (test_paths, test_labels) partition is guaranteed identical to the test
+    partition produced by train_val_test_split() given the same test_ratio and
+    random_seed, since it reuses the same stratified train_test_split call."""
+
+
+# src/training/cross_validation.py (NEW FILE)
+def generate_stratified_folds(
+    labels: List[int],
+    n_splits: int = 10,
+    random_seed: int = 42,
+) -> List[Tuple[np.ndarray, np.ndarray]]:
+    """Returns list of (train_idx, val_idx) index arrays into the CV pool."""
+
+def build_fold_dataloaders(
+    cv_pool_paths: List[str],
+    cv_pool_labels: List[int],
+    train_idx: np.ndarray,
+    val_idx: np.ndarray,
+    class_names: List[str],
+    batch_size: int = 32,
+    num_workers: int = 4,
+) -> Dict[str, DataLoader]:
+    """Returns {'train': DataLoader, 'val': DataLoader} for one fold."""
+
+def train_single_fold(
+    fold_idx: int,
+    fold_loaders: Dict[str, DataLoader],
+    model_name: str,
+    num_classes: int,
+    num_epochs: int = 30,
+    lr: float = 0.001,
+    device: str = 'cpu',
+) -> Dict[str, float]:
+    """Trains one fresh model instance for this fold, returns validation metrics
+    dict: {'accuracy', 'precision', 'recall', 'f1', 'loss'}."""
+
+def run_cross_validation(
+    dataset_root: str,
+    model_name: str = 'efficientnetb0_se',
+    n_splits: int = 10,
+    batch_size: int = 32,
+    num_epochs: int = 30,
+    lr: float = 0.001,
+    device: str = 'cpu',
+    random_seed: int = 42,
+) -> List[Dict[str, float]]:
+    """Top-level orchestrator. Returns list of n_splits per-fold metric dicts."""
+
+
+# src/evaluation/cv_statistics.py (NEW FILE)
+def compute_confidence_interval(
+    values: List[float],
+    confidence: float = 0.95,
+) -> Tuple[float, float]:
+    """Returns (ci_low, ci_high)."""
+
+def aggregate_cv_metrics(
+    fold_metrics: List[Dict[str, float]],
+) -> Dict[str, Dict[str, float]]:
+    """Returns {metric_name: {'mean', 'std', 'ci_low', 'ci_high'}} for
+    accuracy, precision, recall, f1."""
+
+def format_cv_summary(aggregated: Dict[str, Dict[str, float]]) -> str:
+    """Formatted text report."""
+
+def save_cv_results(
+    fold_metrics: List[Dict[str, float]],
+    aggregated: Dict[str, Dict[str, float]],
+    output_path: str,
+) -> None:
+    """Writes CSV to outputs/metrics/."""
+
+
+# scripts/cross_validate.py (NEW FILE)
+def main() -> None:
+    """CLI entry point."""
