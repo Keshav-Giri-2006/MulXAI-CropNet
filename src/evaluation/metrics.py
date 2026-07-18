@@ -19,7 +19,7 @@ from sklearn.metrics import (
     confusion_matrix,
     roc_auc_score,
 )
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 
 class Metrics:
@@ -226,19 +226,32 @@ class Metrics:
         return aggregated
 
     @staticmethod
-    def format_cv_summary(aggregated: Dict[str, Dict[str, float]]) -> str:
+    def format_cv_summary(
+        aggregated: Dict[str, Dict[str, float]],
+        n_splits: Optional[int] = None,
+    ) -> str:
         """
         Format aggregated Cross Validation statistics as a human-readable
         string summary, consistent in style with get_metrics_summary().
 
         Args:
             aggregated: Dictionary as returned by aggregate_cv_metrics()
+            n_splits: Optional number of folds used, for display in the
+                summary title (e.g. "10-Fold Stratified Cross Validation
+                Summary"). This parameter is optional and additive: existing
+                callers that omit it continue to work exactly as before,
+                receiving the fold-count-agnostic title "Stratified Cross
+                Validation Summary" rather than an incorrect hardcoded fold
+                count. Default: None.
 
         Returns:
             Formatted string
         """
         summary = "\n" + "=" * 60 + "\n"
-        summary += "10-Fold Stratified Cross Validation Summary\n"
+        if n_splits is not None:
+            summary += f"{n_splits}-Fold Stratified Cross Validation Summary\n"
+        else:
+            summary += "Stratified Cross Validation Summary\n"
         summary += "=" * 60 + "\n"
 
         for metric_name, stats in aggregated.items():

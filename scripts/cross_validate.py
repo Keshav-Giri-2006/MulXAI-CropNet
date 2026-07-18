@@ -63,7 +63,7 @@ def main():
     )
 
     aggregated = Metrics.aggregate_cv_metrics(fold_metrics)
-    summary = Metrics.format_cv_summary(aggregated)
+    summary = Metrics.format_cv_summary(aggregated, n_splits=args.n_splits)
 
     print(summary)
     logger.info(summary)
