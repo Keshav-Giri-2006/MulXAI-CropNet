@@ -307,3 +307,114 @@ class Metrics:
                 writer.writerow(row)
 
         print(f"Cross Validation results saved to {output_path}")
+
+    @staticmethod
+    def save_classification_metrics(
+        metrics: Dict[str, float],
+        output_path: str,
+    ) -> None:
+        """
+        Write overall classification metrics (accuracy, precision, recall,
+        f1, and any additional scalar keys such as loss) to a CSV file, per
+        the "classification_metrics.csv" deliverable in
+        MEMBER1_CLASSIFICATION_GUIDE.md and EVALUATION_PROTOCOL.md.
+
+        The CSV uses a simple metric,value layout (one row per metric) so
+        that it remains readable and trivially extensible if additional
+        scalar metrics are added later, without changing the file format.
+
+        Args:
+            metrics: Dictionary of scalar metrics, as returned by
+                Metrics.compute_metrics() (optionally with a 'loss' key
+                added by the caller)
+            output_path: Path to write the CSV file
+        """
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+        with open(output_path, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['metric', 'value'])
+            for metric_name, value in metrics.items():
+                writer.writerow([metric_name, value])
+
+        print(f"Classification metrics saved to {output_path}")
+
+    @staticmethod
+    def save_per_class_metrics(
+        per_class_metrics: Dict[str, Dict[str, float]],
+        output_path: str,
+    ) -> None:
+        """
+        Write per-class metrics to a CSV file, per the
+        "per_class_metrics.csv" deliverable in MEMBER1_CLASSIFICATION_GUIDE.md.
+
+        Args:
+            per_class_metrics: Dictionary as returned by
+                Metrics.compute_per_class_metrics() or
+                ModelEvaluator.evaluate_per_class(), i.e.
+                {class_name: {'accuracy', 'precision', 'recall', 'f1', 'samples'}}
+            output_path: Path to write the CSV file
+        """
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+        fieldnames = ['class', 'accuracy', 'precision', 'recall', 'f1', 'samples']
+
+        with open(output_path, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for class_name, class_metrics in per_class_metrics.items():
+                row = {'class': class_name}
+                row.update(class_metrics)
+                writer.writerow(row)
+
+        print(f"Per-class metrics saved to {output_path}")
+
+    @staticmethod
+    def save_training_history(
+        history: Dict[str, Dict[str, List[float]]],
+        output_path: str,
+    ) -> None:
+        """
+        Write per-epoch training and validation history to a CSV file, per
+        the "training_log.csv" deliverable in MEMBER1_CLASSIFICATION_GUIDE.md
+        (outputs/logs/training_log.csv). This is the persisted record that
+        the Training Loss Curve, Validation Loss Curve, and Accuracy Curve
+        are generated from, and lets those plots be regenerated later
+        without re-running training.
+
+        Args:
+            history: Dictionary of the form {'train': {...}, 'val': {...}}
+                as returned by Trainer.get_training_history() / Trainer.train(),
+                where each sub-dictionary has 'loss', 'accuracy', 'f1' keys,
+                each a list of one value per epoch
+            output_path: Path to write the CSV file
+        """
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+        train_history = history['train']
+        val_history = history['val']
+        num_epochs = len(train_history['loss'])
+
+        fieldnames = [
+            'epoch',
+            'train_loss', 'train_accuracy', 'train_f1',
+            'val_loss', 'val_accuracy', 'val_f1',
+        ]
+
+        with open(output_path, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for epoch in range(num_epochs):
+                writer.writerow({
+                    'epoch': epoch + 1,
+                    'train_loss': train_history['loss'][epoch],
+                    'train_accuracy': train_history['accuracy'][epoch],
+                    'train_f1': train_history['f1'][epoch],
+                    'val_loss': val_history['loss'][epoch],
+                    'val_accuracy': val_history['accuracy'][epoch],
+                    'val_f1': val_history['f1'][epoch],
+                })
+
+        print(f"Training history saved to {output_path}")

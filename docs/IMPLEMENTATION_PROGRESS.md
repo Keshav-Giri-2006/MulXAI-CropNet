@@ -10,7 +10,7 @@ Member 1
 
 [x] CV
 
-[ ] Metrics
+[x] Metrics
 
 [x] Per-class Precision / Recall / F1 computation repaired
 
