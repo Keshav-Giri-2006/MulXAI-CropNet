@@ -2,8 +2,14 @@
 Metrics computation for disease classification.
 
 Calculates accuracy, precision, recall, F1, and other evaluation metrics.
+Also provides Cross Validation statistical aggregation (Mean, Standard
+Deviation, 95% Confidence Interval across folds), per ADR-007 and the
+approved Member 1 Phase 2 Cross Validation architecture.
 """
 
+import csv
+import math
+from pathlib import Path
 import numpy as np
 from sklearn.metrics import (
     accuracy_score,
@@ -13,7 +19,7 @@ from sklearn.metrics import (
     confusion_matrix,
     roc_auc_score,
 )
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 
 class Metrics:
@@ -120,3 +126,171 @@ class Metrics:
                 summary += f"{key:.<30} {value}\n"
         summary += "=" * 50 + "\n"
         return summary
+
+    @staticmethod
+    def compute_confidence_interval(
+        values: List[float],
+        confidence: float = 0.95,
+    ) -> Tuple[float, float]:
+        """
+        Compute a confidence interval for a list of values (e.g. per-fold
+        metric values from Cross Validation) using the t-distribution, which
+        is appropriate for the small sample sizes (n=10 folds) produced by
+        10-Fold Stratified Cross Validation.
+
+        Args:
+            values: List of numeric values (one per fold)
+            confidence: Confidence level. Default: 0.95 (95% CI, per
+                EVALUATION_PROTOCOL.md)
+
+        Returns:
+            Tuple of (ci_low, ci_high)
+
+        Raises:
+            ValueError: If values is empty
+        """
+        if not values:
+            raise ValueError("Cannot compute confidence interval on empty values list")
+
+        n = len(values)
+        mean = float(np.mean(values))
+
+        if n == 1:
+            return mean, mean
+
+        std_err = float(np.std(values, ddof=1)) / math.sqrt(n)
+
+        try:
+            from scipy import stats
+            t_critical = stats.t.ppf((1 + confidence) / 2.0, df=n - 1)
+        except ImportError:
+            # Fallback: normal approximation z-critical value for 95% CI
+            # if scipy is unavailable. Approved dependencies (scikit-learn,
+            # numpy) do not guarantee scipy is installed; this fallback
+            # avoids introducing a new hard dependency.
+            z_table = {0.90: 1.645, 0.95: 1.96, 0.99: 2.576}
+            t_critical = z_table.get(confidence, 1.96)
+
+        margin = t_critical * std_err
+
+        return mean - margin, mean + margin
+
+    @staticmethod
+    def aggregate_cv_metrics(
+        fold_metrics: List[Dict[str, float]],
+    ) -> Dict[str, Dict[str, float]]:
+        """
+        Aggregate per-fold Cross Validation metrics into summary statistics.
+
+        Computes Mean, Standard Deviation, and 95% Confidence Interval across
+        folds for accuracy, precision, recall, and f1, per the mandatory
+        reporting requirements in EVALUATION_PROTOCOL.md.
+
+        Args:
+            fold_metrics: List of per-fold metric dictionaries, each
+                containing at minimum 'accuracy', 'precision', 'recall', 'f1'
+                keys (as returned by train_single_fold())
+
+        Returns:
+            Dictionary of the form:
+                {metric_name: {'mean': float, 'std': float,
+                                'ci_low': float, 'ci_high': float}}
+            for each of accuracy, precision, recall, f1.
+
+        Raises:
+            ValueError: If fold_metrics is empty
+        """
+        if not fold_metrics:
+            raise ValueError("Cannot aggregate an empty list of fold metrics")
+
+        tracked_metrics = ['accuracy', 'precision', 'recall', 'f1']
+        aggregated: Dict[str, Dict[str, float]] = {}
+
+        for metric_name in tracked_metrics:
+            values = [fold[metric_name] for fold in fold_metrics if metric_name in fold]
+
+            if not values:
+                continue
+
+            mean = float(np.mean(values))
+            std = float(np.std(values, ddof=1)) if len(values) > 1 else 0.0
+            ci_low, ci_high = Metrics.compute_confidence_interval(values, confidence=0.95)
+
+            aggregated[metric_name] = {
+                'mean': mean,
+                'std': std,
+                'ci_low': ci_low,
+                'ci_high': ci_high,
+            }
+
+        return aggregated
+
+    @staticmethod
+    def format_cv_summary(aggregated: Dict[str, Dict[str, float]]) -> str:
+        """
+        Format aggregated Cross Validation statistics as a human-readable
+        string summary, consistent in style with get_metrics_summary().
+
+        Args:
+            aggregated: Dictionary as returned by aggregate_cv_metrics()
+
+        Returns:
+            Formatted string
+        """
+        summary = "\n" + "=" * 60 + "\n"
+        summary += "10-Fold Stratified Cross Validation Summary\n"
+        summary += "=" * 60 + "\n"
+
+        for metric_name, stats in aggregated.items():
+            summary += f"\n{metric_name.capitalize()}\n"
+            summary += f"{'  Mean:':.<30} {stats['mean']:.4f}\n"
+            summary += f"{'  Std Dev:':.<30} {stats['std']:.4f}\n"
+            summary += f"{'  95% CI:':.<30} [{stats['ci_low']:.4f}, {stats['ci_high']:.4f}]\n"
+
+        summary += "\n" + "=" * 60 + "\n"
+        return summary
+
+    @staticmethod
+    def save_cv_results(
+        fold_metrics: List[Dict[str, float]],
+        aggregated: Dict[str, Dict[str, float]],
+        output_path: str,
+    ) -> None:
+        """
+        Write per-fold Cross Validation metrics and aggregated summary
+        statistics to a CSV file.
+
+        The CSV contains one row per fold followed by summary rows for mean,
+        std, ci_low, and ci_high across all tracked metrics, so the full
+        record (per-fold results plus aggregation) is preserved in a single
+        file under outputs/metrics/, per PROJECT_STRUCTURE.md.
+
+        Args:
+            fold_metrics: List of per-fold metric dictionaries
+            aggregated: Dictionary as returned by aggregate_cv_metrics()
+            output_path: Path to write the CSV file
+        """
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+        tracked_metrics = ['accuracy', 'precision', 'recall', 'f1']
+        fieldnames = ['fold'] + tracked_metrics
+
+        with open(output_path, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for fold_idx, fold in enumerate(fold_metrics):
+                row = {'fold': fold_idx + 1}
+                for metric_name in tracked_metrics:
+                    if metric_name in fold:
+                        row[metric_name] = fold[metric_name]
+                writer.writerow(row)
+
+            for stat_key in ('mean', 'std', 'ci_low', 'ci_high'):
+                row = {'fold': stat_key}
+                for metric_name in tracked_metrics:
+                    if metric_name in aggregated:
+                        row[metric_name] = aggregated[metric_name][stat_key]
+                writer.writerow(row)
+
+        print(f"Cross Validation results saved to {output_path}")

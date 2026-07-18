@@ -6,13 +6,18 @@ and preprocess the PlantVillage Tomato dataset with Albumentations augmentation.
 
 Classes:
     PlantVillageDataset: Custom PyTorch Dataset for image classification
+    CVSplit: Structured result for CV pool / holdout partitioning
 
 Functions:
     get_class_names: Automatically discovers disease class names from dataset directory
     get_dataloaders: Creates and returns DataLoader instances for train/val/test splits
+    get_cv_pool_and_holdout: Returns the 85% CV pool and the permanently held-out
+        15% test partition (ADR-007), using the same split implementation as
+        train_val_test_split()
 """
 
 import os
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Tuple, List, Dict
 import numpy as np
@@ -164,6 +169,44 @@ def create_val_transform() -> A.Compose:
     return AugmentationFactory.get_light_augmentation()
 
 
+def _stratified_holdout_split(
+    image_paths: List[str],
+    labels: List[int],
+    test_ratio: float,
+    random_seed: int,
+) -> Tuple[List[str], List[int], List[str], List[int]]:
+    """
+    Single implementation of the stratified test-holdout split.
+
+    This is the sole implementation of the "first split" stage used to carve
+    out a stratified holdout partition from the full dataset. It is called by
+    both train_val_test_split() (which further subdivides the remaining pool
+    into train/val) and get_cv_pool_and_holdout() (which returns the remaining
+    pool untouched for Cross Validation, per ADR-007). Keeping this logic in
+    one place guarantees both callers produce an identical holdout partition
+    given the same test_ratio and random_seed.
+
+    Args:
+        image_paths: Full list of image paths to split
+        labels: Full list of class indices corresponding to image_paths
+        test_ratio: Proportion of data to hold out
+        random_seed: Random seed for reproducibility
+
+    Returns:
+        Tuple of (pool_paths, pool_labels, holdout_paths, holdout_labels)
+    """
+    from sklearn.model_selection import train_test_split
+
+    pool_paths, holdout_paths, pool_labels, holdout_labels = train_test_split(
+        image_paths, labels,
+        test_size=test_ratio,
+        random_state=random_seed,
+        stratify=labels,
+    )
+
+    return pool_paths, pool_labels, holdout_paths, holdout_labels
+
+
 def train_val_test_split(
     image_paths: List[str],
     labels: List[int],
@@ -175,19 +218,24 @@ def train_val_test_split(
     """
     Stratified split dataset into train, validation, and test subsets.
     Maintains class distribution - compatible with 10-fold stratified cross-validation.
+
+    Internally delegates its first split (separating the test holdout from the
+    remaining pool) to _stratified_holdout_split(), the single implementation
+    of that split logic shared with get_cv_pool_and_holdout(). Public signature
+    and return values are unchanged from prior versions of this function for
+    identical inputs.
     """
     from sklearn.model_selection import train_test_split
-    
+
     total_ratio = train_ratio + val_ratio + test_ratio
     if not (0.99 < total_ratio < 1.01):
         raise ValueError(f"Ratios must sum to 1.0, got {total_ratio}")
 
-    # First split: separate test set with stratification
-    train_val_paths, test_paths, train_val_labels, test_labels = train_test_split(
+    # First split: separate test set with stratification (shared implementation)
+    train_val_paths, train_val_labels, test_paths, test_labels = _stratified_holdout_split(
         image_paths, labels,
-        test_size=test_ratio,
-        random_state=random_seed,
-        stratify=labels
+        test_ratio=test_ratio,
+        random_seed=random_seed,
     )
 
     # Second split: separate validation from training with stratification
@@ -263,12 +311,73 @@ def get_dataloaders(
 
     return {"train": train_loader, "val": val_loader, "test": test_loader, "class_names": class_names}
 
+
+@dataclass
+class CVSplit:
+    """
+    Structured result for Cross Validation pool / holdout partitioning.
+
+    Returned by get_cv_pool_and_holdout(). Carries the 85% Cross Validation
+    pool (to be further divided into stratified folds by
+    src/training/cross_validation.py) and the permanently held-out 15% test
+    partition (per ADR-007), which must never be passed into fold generation
+    and is not consumed by the Cross Validation pipeline itself.
+
+    Attributes:
+        cv_pool_paths: Image paths comprising the 85% CV pool
+        cv_pool_labels: Class indices corresponding to cv_pool_paths
+        test_paths: Image paths comprising the permanently held-out 15% test set
+        test_labels: Class indices corresponding to test_paths
+        class_names: Ordered list of disease class names
+    """
+    cv_pool_paths: List[str] = field(default_factory=list)
+    cv_pool_labels: List[int] = field(default_factory=list)
+    test_paths: List[str] = field(default_factory=list)
+    test_labels: List[int] = field(default_factory=list)
+    class_names: List[str] = field(default_factory=list)
+
+
 def get_cv_pool_and_holdout(
     dataset_root: str,
     test_ratio: float = 0.15,
     random_seed: int = 42,
-) -> Tuple[Tuple[List[str], List[int]], Tuple[List[str], List[int]], List[str]]:
-    """Returns (cv_pool_paths, cv_pool_labels), (test_paths, test_labels), class_names.
-    The (test_paths, test_labels) partition is guaranteed identical to the test
-    partition produced by train_val_test_split() given the same test_ratio and
-    random_seed, since it reuses the same stratified train_test_split call."""
+) -> CVSplit:
+    """
+    Return the 85% Cross Validation pool and the permanently held-out 15% test
+    partition, per ADR-007.
+
+    The (test_paths, test_labels) partition is guaranteed identical to the
+    test partition produced by train_val_test_split() given the same
+    test_ratio and random_seed, since both call _stratified_holdout_split(),
+    the single shared implementation of the stratified holdout split.
+
+    The returned cv_pool_paths/cv_pool_labels represent the full remaining 85%
+    and are not yet divided into train/validation folds; fold generation is
+    the responsibility of src/training/cross_validation.py.
+
+    Args:
+        dataset_root: Path to dataset root directory
+        test_ratio: Proportion of data to permanently hold out as the test
+            partition. Default: 0.15
+        random_seed: Random seed for reproducibility. Default: 42
+
+    Returns:
+        CVSplit containing the CV pool, the held-out test partition, and the
+        discovered class names.
+    """
+    class_names = get_class_names(dataset_root)
+    image_paths, labels = load_dataset_paths(dataset_root, class_names)
+
+    cv_pool_paths, cv_pool_labels, test_paths, test_labels = _stratified_holdout_split(
+        image_paths, labels,
+        test_ratio=test_ratio,
+        random_seed=random_seed,
+    )
+
+    return CVSplit(
+        cv_pool_paths=cv_pool_paths,
+        cv_pool_labels=cv_pool_labels,
+        test_paths=test_paths,
+        test_labels=test_labels,
+        class_names=class_names,
+    )
