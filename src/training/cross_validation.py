@@ -65,7 +65,7 @@ def build_fold_dataloaders(
     train_idx: np.ndarray,
     val_idx: np.ndarray,
     batch_size: int = 32,
-    num_workers: int = 4,
+    num_workers: int = 0,
 ) -> Dict[str, DataLoader]:
     """
     Build train/validation DataLoaders for a single Cross Validation fold by
